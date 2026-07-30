@@ -1,23 +1,25 @@
 /**
- * NOVO SORRISO ODONTOLOGIA VILA ALBERTINA - MASTER JAVASCRIPT
- * ES2023 Vanilla JS, Acessibilidade WCAG 2.2 AA, Scroll Observer e CRO.
+ * NOVO SORRISO ODONTOLOGIA VILA ALBERTINA - MASTER JAVASCRIPT (RESPONSIVO)
+ * ES2023 Vanilla JS com Tratamento de Eventos Touch, Backdrop e Acessibilidade.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* --- 1. HEADER STICKY & MOBILE NAV TOGGLE --- */
+    /* --- 1. HEADER STICKY, GAVETEIRO MOBILE & OVERLAY --- */
     const header = document.getElementById('header');
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const navMenu = document.getElementById('nav-menu');
+    const menuOverlay = document.getElementById('menu-overlay');
     const navLinks = document.querySelectorAll('.nav-link');
     const body = document.body;
 
     let ticking = false;
 
+    // Header com scroll suave e otimização por requestAnimationFrame
     window.addEventListener('scroll', () => {
         if (!ticking) {
             window.requestAnimationFrame(() => {
-                if (window.scrollY > 50) {
+                if (window.scrollY > 40) {
                     header.classList.add('scrolled');
                 } else {
                     header.classList.remove('scrolled');
@@ -28,26 +30,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, { passive: true });
 
+    // Alternar menu mobile
     function toggleMenu() {
         const isOpen = navMenu.classList.toggle('active');
         hamburgerBtn.classList.toggle('open', isOpen);
+        if (menuOverlay) menuOverlay.classList.toggle('active', isOpen);
         hamburgerBtn.setAttribute('aria-expanded', isOpen.toString());
         body.classList.toggle('no-scroll', isOpen);
+    }
+
+    function closeMenu() {
+        if (navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            hamburgerBtn.classList.remove('open');
+            if (menuOverlay) menuOverlay.classList.remove('active');
+            hamburgerBtn.setAttribute('aria-expanded', 'false');
+            body.classList.remove('no-scroll');
+        }
     }
 
     if (hamburgerBtn) {
         hamburgerBtn.addEventListener('click', toggleMenu);
     }
 
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', closeMenu);
+    }
+
     navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (navMenu.classList.contains('active')) {
-                toggleMenu();
-            }
-        });
+        link.addEventListener('click', closeMenu);
     });
 
-    /* --- 2. HIGHLIGHT NAV ON SCROLL --- */
+    /* --- 2. HIGHLIGHT DINÂMICO NO MENU AO ROLAR A PÁGINA --- */
     const sections = document.querySelectorAll('section[id]');
 
     function highlightNavOnScroll() {
@@ -73,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.requestAnimationFrame(highlightNavOnScroll);
     }, { passive: true });
 
-    /* --- 3. ACCORDION FAQ (Acessível) --- */
+    /* --- 3. ACCORDION FAQ (ACESSÍVEL) --- */
     const accordionHeaders = document.querySelectorAll('.accordion-header');
 
     accordionHeaders.forEach(headerBtn => {
@@ -81,12 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const accordionItem = headerBtn.parentElement;
             const isOpen = accordionItem.classList.contains('active');
 
+            // Fechar todos os sanfonados abertos
             document.querySelectorAll('.accordion-item').forEach(item => {
                 item.classList.remove('active');
                 const btn = item.querySelector('.accordion-header');
                 if (btn) btn.setAttribute('aria-expanded', 'false');
             });
 
+            // Se não estava aberto, abre o selecionado
             if (!isOpen) {
                 accordionItem.classList.add('active');
                 headerBtn.setAttribute('aria-expanded', 'true');
@@ -94,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    /* --- 4. SCROLL REVEAL (Intersection Observer) --- */
+    /* --- 4. SCROLL REVEAL (INTERSECTION OBSERVER) --- */
     const revealElements = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right');
 
     const revealObserver = new IntersectionObserver((entries, observer) => {
@@ -106,18 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, {
         threshold: 0.05,
-        rootMargin: '0px 0px -50px 0px'
+        rootMargin: '0px 0px -40px 0px'
     });
 
     revealElements.forEach(el => revealObserver.observe(el));
 
-    /* --- 5. BACK TO TOP BUTTON --- */
+    /* --- 5. BOTÃO VOLTAR AO TOPO (BACK TO TOP) --- */
     const backToTopBtn = document.getElementById('backToTop');
 
     window.addEventListener('scroll', () => {
         if (!ticking) {
             window.requestAnimationFrame(() => {
-                if (window.scrollY > 400) {
+                if (window.scrollY > 350) {
                     backToTopBtn.classList.add('visible');
                 } else {
                     backToTopBtn.classList.remove('visible');
